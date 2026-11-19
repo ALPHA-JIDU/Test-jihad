@@ -1,0 +1,9 @@
+/*
+  CLOUDFLARE PAGES CONTENT HOSTING HEADERS
+  - Allows your Vercel site (https://test-jihad.vercel.app) to fetch content without CORS errors
+  - Refreshes quotes, gallery, and journal JSON/JS files within 60 seconds after updates
+*/
+/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=60, must-revalidate
+*/
