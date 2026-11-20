@@ -56,7 +56,7 @@ function cleanNauticalRoutesPlugin() {
 
 export default defineConfig(() => {
   return {
-    base: './',
+    base: '/',
     publicDir: false,
     plugins: [tailwindcss(), copyStaticAssetsPlugin(), cleanNauticalRoutesPlugin()],
     resolve: {

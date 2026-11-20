@@ -9,7 +9,7 @@ export function renderBlogView(container) {
       <header class="border-b border-white/8 bg-[#080808]">
         <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 h-16 flex items-center justify-between gap-6">
           <a
-            href="./"
+            href="/"
             data-spa-link="home"
             class="inline-flex items-center gap-2 min-h-[44px] text-xs sm:text-sm text-neutral-300 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-md whitespace-nowrap shrink-0"
           >
@@ -19,8 +19,8 @@ export function renderBlogView(container) {
             <span>Back to Home</span>
           </a>
           <nav aria-label="Section links" class="hidden sm:flex items-center gap-6 text-xs sm:text-sm">
-            <a href="./darkroom" data-spa-link="gallery" class="min-h-[44px] inline-flex items-center text-neutral-400 hover:text-white transition-colors whitespace-nowrap shrink-0">Visit gallery</a>
-            <a href="./watch" data-spa-link="quotes" class="min-h-[44px] inline-flex items-center text-neutral-400 hover:text-white transition-colors whitespace-nowrap shrink-0">Read quotes</a>
+            <a href="/darkroom" data-spa-link="gallery" class="min-h-[44px] inline-flex items-center text-neutral-400 hover:text-white transition-colors whitespace-nowrap shrink-0">Visit gallery</a>
+            <a href="/watch" data-spa-link="quotes" class="min-h-[44px] inline-flex items-center text-neutral-400 hover:text-white transition-colors whitespace-nowrap shrink-0">Read quotes</a>
           </nav>
         </div>
       </header>
@@ -255,7 +255,7 @@ export function renderBlogView(container) {
   let lastFocusedEl = null;
 
   function buildShareUrl(postId) {
-    return new URL(`./logbook#${postId}`, window.location.href).href;
+    return new URL(`/logbook#${postId}`, window.location.origin).href;
   }
 
   const grid = container.querySelector('#blog-grid');

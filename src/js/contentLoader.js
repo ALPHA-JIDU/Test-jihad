@@ -167,7 +167,7 @@ export function getHeroPortrait() {
   return cachedContent.portraitUrl || HERO_MEDIA.portrait;
 }
 
-export async function loadPortfolioContent({ onUpdate, initialBudgetMs = 900 } = {}) {
+export async function loadPortfolioContent({ onUpdate, initialBudgetMs = 350 } = {}) {
   if (!hasRemoteEndpoints()) {
     return cachedContent;
   }

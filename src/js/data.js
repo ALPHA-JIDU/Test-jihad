@@ -56,7 +56,7 @@ export function optimizeImageUrl(rawUrl, { width } = {}) {
 }
 
 export const HERO_MEDIA = {
-  portrait: './src/assets/images/Picsart_26-11-14_22-21-08-763_d8c22dd8.jpg',
+  portrait: '/src/assets/images/Picsart_26-11-14_22-21-08-763_d8c22dd8.jpg',
 };
 
 export const HOME_QUOTES = [

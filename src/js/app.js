@@ -9,25 +9,25 @@ import { renderBlogView } from './blogView.js';
 
 const ROUTE_META = {
   home: {
-    path: './',
+    path: '/',
     canonicalPath: '/',
     title: 'Jahidul Islam Jihad — Mariner & Monochrome Photographer',
     label: 'Home',
   },
   quotes: {
-    path: './watch',
+    path: '/watch',
     canonicalPath: '/watch',
     title: 'Read quotes — Jahidul Islam Jihad',
     label: 'Read quotes',
   },
   gallery: {
-    path: './darkroom',
+    path: '/darkroom',
     canonicalPath: '/darkroom',
     title: 'Visit gallery — Jahidul Islam Jihad',
     label: 'Visit gallery',
   },
   blog: {
-    path: './logbook',
+    path: '/logbook',
     canonicalPath: '/logbook',
     title: 'Explore stories — Jahidul Islam Jihad',
     label: 'Explore stories',
@@ -106,9 +106,6 @@ function waitForImagesAndMinTime(
     };
     img.addEventListener('load', mark, { once: true });
     img.addEventListener('error', mark, { once: true });
-    if (typeof img.decode === 'function') {
-      img.decode().then(mark).catch(() => {});
-    }
   });
 
   window.setTimeout(finishIfReady, maxTimeoutMs);
@@ -132,7 +129,7 @@ function waitForInitialPreload(images) {
 
   const startTime =
     typeof window.__preloaderStart === 'number' ? window.__preloaderStart : Date.now();
-  waitForImagesAndMinTime(images, 700, startTime, dismissPreloader, 8000);
+  waitForImagesAndMinTime(images, 350, startTime, dismissPreloader, 1500);
 }
 
 let compassHideTimer = null;
@@ -512,7 +509,7 @@ function renderHomeView(container, { waitPreloader = false } = {}) {
 
               <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
                 <a
-                  href="./watch"
+                  href="/watch"
                   data-spa-link="quotes"
                   class="inline-flex items-center justify-center gap-2.5 min-h-[46px] px-6 py-2.5 rounded-full border border-white/25 bg-white/[0.04] text-xs sm:text-sm font-medium tracking-wide text-white hover:bg-white hover:text-neutral-950 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white whitespace-nowrap shrink-0"
                 >
@@ -523,7 +520,7 @@ function renderHomeView(container, { waitPreloader = false } = {}) {
                 </a>
 
                 <a
-                  href="./logbook"
+                  href="/logbook"
                   data-spa-link="blog"
                   class="${showBlogAction ? 'inline-flex' : 'hidden'} items-center justify-center gap-2.5 min-h-[46px] px-6 py-2.5 rounded-full bg-white text-neutral-950 text-xs sm:text-sm font-medium tracking-wide hover:bg-neutral-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#080808] whitespace-nowrap shrink-0"
                 >
@@ -556,7 +553,7 @@ function renderHomeView(container, { waitPreloader = false } = {}) {
               </div>
 
               <a
-                href="./darkroom"
+                href="/darkroom"
                 data-spa-link="gallery"
                 class="inline-flex items-center gap-2 min-h-[44px] px-2 text-xs sm:text-sm font-medium tracking-wide text-neutral-300 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-md whitespace-nowrap shrink-0"
               >
@@ -1170,7 +1167,11 @@ function mountRoute(
   updateSeoHead(targetRoute);
 
   if (pushHistory) {
-    window.history.pushState({ route: targetRoute }, '', meta.path);
+    try {
+      window.history.pushState({ route: targetRoute }, '', meta.path);
+    } catch {
+      // Ignore sandboxed history restrictions
+    }
   }
 
   if (targetRoute === 'quotes') {
@@ -1189,7 +1190,7 @@ function mountRoute(
 
   if (isInitial || force) {
     if (isInitial && targetRoute !== 'home') {
-      waitForInitialPreload(root.querySelectorAll('img'));
+      waitForInitialPreload([]);
     }
     return;
   }
@@ -1197,67 +1198,89 @@ function mountRoute(
   const targetImages =
     targetRoute === 'home'
       ? [root.querySelector('#hero-portrait')].filter(Boolean)
-      : root.querySelectorAll('img');
+      : [];
 
   waitForImagesAndMinTime(
     targetImages,
-    500,
+    280,
     switchStartTime,
     () => {
       if (transitionId !== routeTransitionSeq) return;
       hideCompassLoader();
     },
-    8000
+    1400
   );
 }
 
 async function bootApp() {
-  initLightbox();
-  await loadPortfolioContent({
-    onUpdate: () => {
-      const hasOpenModal = Boolean(
-        document.querySelector('#lightbox-modal.flex, #blog-reader-modal.flex')
-      );
-      const isTypingInForm = Boolean(document.activeElement?.closest('#contact-form'));
-      if (!hasOpenModal && !isTypingInForm && currentActiveRoute) {
-        mountRoute(currentActiveRoute, {
-          pushHistory: false,
-          scrollTop: false,
-          isInitial: false,
-          force: true,
-        });
-      }
-    },
-  });
-
-  const initialRoute = resolveRouteFromLocation();
-  window.history.replaceState(
-    { route: initialRoute },
-    '',
-    window.location.pathname + window.location.search + window.location.hash
-  );
-  mountRoute(initialRoute, { pushHistory: false, scrollTop: false, isInitial: true });
-
-  document.addEventListener('click', (e) => {
-    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
-      return;
+  try {
+    initLightbox();
+    try {
+      await loadPortfolioContent({
+        initialBudgetMs: 350,
+        onUpdate: () => {
+          const hasOpenModal = Boolean(
+            document.querySelector('#lightbox-modal.flex, #blog-reader-modal.flex')
+          );
+          const isTypingInForm = Boolean(document.activeElement?.closest('#contact-form'));
+          if (!hasOpenModal && !isTypingInForm && currentActiveRoute) {
+            mountRoute(currentActiveRoute, {
+              pushHistory: false,
+              scrollTop: false,
+              isInitial: false,
+              force: true,
+            });
+          }
+        },
+      });
+    } catch {
+      // Continue immediately with local fallback content
     }
 
-    const link = e.target.closest('a[data-spa-link]');
-    if (!link) return;
+    const initialRoute = resolveRouteFromLocation();
+    try {
+      window.history.replaceState(
+        { route: initialRoute },
+        '',
+        window.location.pathname + window.location.search + window.location.hash
+      );
+    } catch {
+      // Ignore sandboxed history restrictions
+    }
+    mountRoute(initialRoute, { pushHistory: false, scrollTop: false, isInitial: true });
 
-    const targetRoute = link.getAttribute('data-spa-link');
-    if (!targetRoute || !ROUTE_META[targetRoute]) return;
+    document.addEventListener('click', (e) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+        return;
+      }
 
-    e.preventDefault();
-    mountRoute(targetRoute, { pushHistory: true, scrollTop: true, isInitial: false });
-    document.getElementById('main-content')?.focus({ preventScroll: true });
-  });
+      const link = e.target.closest('a[data-spa-link]');
+      if (!link) return;
 
-  window.addEventListener('popstate', (e) => {
-    const nextRoute = e.state?.route || resolveRouteFromLocation();
-    mountRoute(nextRoute, { pushHistory: false, scrollTop: true, isInitial: false });
-  });
+      const targetRoute = link.getAttribute('data-spa-link');
+      if (!targetRoute || !ROUTE_META[targetRoute]) return;
+
+      e.preventDefault();
+      mountRoute(targetRoute, { pushHistory: true, scrollTop: true, isInitial: false });
+      document.getElementById('main-content')?.focus({ preventScroll: true });
+    });
+
+    window.addEventListener('popstate', (e) => {
+      const nextRoute = e.state?.route || resolveRouteFromLocation();
+      mountRoute(nextRoute, { pushHistory: false, scrollTop: true, isInitial: false });
+    });
+
+    window.addEventListener('pageshow', (e) => {
+      if (e.persisted) {
+        dismissPreloader();
+        hideCompassLoader();
+      }
+    });
+  } catch (err) {
+    console.error('Portfolio boot error:', err);
+    dismissPreloader();
+    hideCompassLoader();
+  }
 }
 
 if (document.readyState === 'loading') {

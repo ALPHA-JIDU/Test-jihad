@@ -27,15 +27,15 @@
       content="Collected reflections and maritime quotes written between watches at sea by Jahidul Islam Jihad."
     />
     <meta name="twitter:image" content="https://test-jihad.vercel.app/src/assets/images/Picsart_26-11-14_22-21-08-763_d8c22dd8.jpg" />
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-    <link rel="apple-touch-icon" href="./src/assets/images/Picsart_26-11-14_22-21-08-763_d8c22dd8.jpg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/src/assets/images/Picsart_26-11-14_22-21-08-763_d8c22dd8.jpg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./src/styles.css" />
+    <link rel="stylesheet" href="/src/index.css" />
   </head>
   <body data-route="quotes" class="bg-[#080808] text-neutral-100 antialiased selection:bg-white selection:text-neutral-950">
     <!-- Ship's Wheel First-Visit Preloader Overlay -->
@@ -81,8 +81,9 @@
         if (el && !el.classList.contains('is-hidden')) {
           el.classList.add('is-hidden');
           el.setAttribute('aria-hidden', 'true');
+          el.style.display = 'none';
         }
-      }, 8500);
+      }, 2500);
     </script>
 
     <a
@@ -97,13 +98,13 @@
         <h1 class="font-serif text-3xl text-white">Read quotes — Jahidul Islam Jihad</h1>
         <p>Collected thoughts from watches at sea and monochrome photography notes.</p>
         <nav aria-label="Section navigation" class="flex flex-wrap gap-6 text-sm underline">
-          <a href="./">Home</a>
-          <a href="./darkroom">Visit gallery</a>
-          <a href="./logbook">Explore stories</a>
+          <a href="/">Home</a>
+          <a href="/darkroom">Visit gallery</a>
+          <a href="/logbook">Explore stories</a>
         </nav>
       </main>
     </div>
 
-    <script type="module" src="./src/js/app.js"></script>
+    <script type="module" src="/src/js/app.js"></script>
   </body>
 </html>

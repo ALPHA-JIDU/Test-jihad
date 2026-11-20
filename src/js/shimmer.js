@@ -2,18 +2,28 @@ export function bindImageShimmer(img, wrapper, onFallback, srcUrl) {
   if (!img || !wrapper) return;
 
   let settled = false;
+  let fallbackTimer = null;
   wrapper.classList.add('img-shimmer');
   wrapper.classList.remove('is-loaded');
+
+  const clearTimer = () => {
+    if (fallbackTimer !== null) {
+      window.clearTimeout(fallbackTimer);
+      fallbackTimer = null;
+    }
+  };
 
   const markLoaded = () => {
     if (settled) return;
     settled = true;
+    clearTimer();
     wrapper.classList.add('is-loaded');
   };
 
   const handleError = () => {
     if (settled) return;
     settled = true;
+    clearTimer();
     wrapper.classList.add('is-loaded');
     if (typeof onFallback === 'function') {
       onFallback();
@@ -30,12 +40,23 @@ export function bindImageShimmer(img, wrapper, onFallback, srcUrl) {
   if (img.complete) {
     if (img.naturalWidth > 0) {
       markLoaded();
-    } else if (typeof img.decode === 'function') {
-      img.decode().then(markLoaded).catch(() => {});
+      return;
     }
-  } else if (typeof img.decode === 'function') {
-    img.decode().then(markLoaded).catch(() => {});
+    if (img.getAttribute('src')) {
+      handleError();
+      return;
+    }
   }
+
+  fallbackTimer = window.setTimeout(() => {
+    if (!settled) {
+      if (img.complete && img.naturalWidth > 0) {
+        markLoaded();
+      } else {
+        handleError();
+      }
+    }
+  }, 12000);
 }
 
 export function createFallbackTile(titleText) {
